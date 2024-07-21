@@ -49,6 +49,8 @@ Result openDialog(out string path, FilterItem[] filters, string defaultPath = nu
   return response.asOriginalType.to!Result;
 }
 
+// TODO: NFD_OpenDialogN_With
+
 ///
 Result openDialogMultiple(out PathSet paths, FilterItem[] filters, string defaultPath = null) {
   PathSet outPaths;
@@ -57,6 +59,8 @@ Result openDialogMultiple(out PathSet paths, FilterItem[] filters, string defaul
   paths = outPaths;
   return response.asOriginalType.to!Result;
 }
+
+// TODO: NFD_OpenDialogMultipleN_With
 
 ///
 Result saveDialog(out string path, FilterItem[] filters, string defaultName = null, string defaultPath = null) {
@@ -73,6 +77,8 @@ Result saveDialog(out string path, FilterItem[] filters, string defaultName = nu
   return response.asOriginalType.to!Result;
 }
 
+// TODO: NFD_SaveDialogN_With
+
 ///
 Result pickFolder(out string path, string defaultPath = null) {
   nfdchar_t* outPath;
@@ -85,6 +91,8 @@ Result pickFolder(out string path, string defaultPath = null) {
   }
   return response.asOriginalType.to!Result;
 }
+
+// TODO: NFD_PickFolderN_With
 
 ///
 alias PathSetSize = nfdpathsetsize_t;
