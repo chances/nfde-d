@@ -59,8 +59,18 @@ Result openDialogMultiple(out PathSet paths, FilterItem[] filters, string defaul
 }
 
 ///
-Result saveDialog() {
-  assert(0, "Unimplemented!");
+Result saveDialog(out string path, FilterItem[] filters, string defaultName = null, string defaultPath = null) {
+  nfdchar_t* savePath;
+
+  auto response = NFD_SaveDialogN(
+    &savePath, filters.ptr, filters.length.to!uint, defaultPath.toStringz, defaultName.toStringz
+  );
+  if (response.asOriginalType == Result.okay) {
+    const selectedPath = savePath[0 .. savePath.strlen].to!string.idup;
+    NFD_FreePathN(savePath);
+    path = selectedPath;
+  }
+  return response.asOriginalType.to!Result;
 }
 
 ///
