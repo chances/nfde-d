@@ -1,3 +1,8 @@
+# Artifacts
+bin/libnfde.a
+bin/nfde_dialogs
+
+# Dub
 .dub
 docs.json
 __dummy.html

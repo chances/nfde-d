@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/dialogs
+dialogs.so
+dialogs.dylib
+dialogs.dll
+dialogs.a
+dialogs.lib
+dialogs-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst

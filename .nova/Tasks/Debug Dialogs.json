@@ -1,0 +1,22 @@
+{
+  "actions" : {
+    "build" : {
+      "postActions" : [
+        {
+          "script" : "#!\/bin\/sh\ndub build nfde:dialogs --build=debug",
+          "type" : "runScript"
+        }
+      ]
+    }
+  },
+  "buildBeforeRunning" : true,
+  "extension" : {
+    "identifier" : "panic.Icarus",
+    "name" : "Icarus"
+  },
+  "extensionTemplate" : "lldbDebug",
+  "extensionValues" : {
+    "launchPath" : "\/Users\/chancesnow\/GitHub\/nfde-d\/bin\/nfde_dialogs"
+  },
+  "openLogOnRun" : "fail"
+}

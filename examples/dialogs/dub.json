@@ -1,0 +1,15 @@
+{
+	"name": "dialogs",
+	"description": "Demo app for nfde D bindings.",
+	"license": "Zlib",
+	"copyright": "Copyright © 2024, Chance Snow",
+	"authors": [
+		"Chance Snow"
+	],
+  "targetPath": "../../bin",
+  "dependencies": {
+    "nfde": {
+      "path": "../../"
+    }
+  }
+}
