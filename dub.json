@@ -39,6 +39,9 @@
     "cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/build -DNFD_BUILD_TESTS=OFF $NFDE_PACKAGE_DIR/nativefiledialog-extended",
     "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/build --config Release"
   ],
+  "libs-windows": ["ole32", "uuid", "shell32"],
+  "lflags-osx": ["-weak_framework", "AppKit", "-weak_framework", "UniformTypeIdentifiers"],
+  "libs-linux": ["gtk-3"],
   "lflags-posix": [
     "$NFDE_PACKAGE_DIR/nativefiledialog-extended/build/src/libnfd.a"
   ]
