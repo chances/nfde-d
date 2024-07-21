@@ -27,6 +27,7 @@ enum Result : int {
   cancel
 }
 
+///
 string getError() {
   auto error = NFD_GetError();
   if (error !is null) NFD_ClearError();
