@@ -5,10 +5,15 @@ import nfde;
 void main() {
   import std.conv : text;
 
-  "Prompting the user to open a file...".writeln;
-
   string path;
+
+  "Prompting the user to open a file...".writeln;
   auto result = openDialog(path, []);
+  assert(result != Result.error, getError());
+  (result.text ~ ": " ~ path).writeln;
+
+  "Prompting the user to pick a folder...".writeln;
+  result = pickFolder(path);
   assert(result != Result.error, getError());
   (result.text ~ ": " ~ path).writeln;
 }

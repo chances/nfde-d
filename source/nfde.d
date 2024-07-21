@@ -3,6 +3,7 @@ module nfde;
 import core.stdc.limits : PATH_MAX;
 import core.stdc.string : strlen;
 import std.conv : asOriginalType, to;
+import std.string : toStringz;
 
 import nfde_bindings;
 
@@ -37,11 +38,9 @@ alias FilterItem = nfdnfilteritem_t;
 
 ///
 Result openDialog(out string path, FilterItem[] filters, string defaultPath = null) {
-  import std.conv : castFrom;
-
   nfdchar_t* outPath;
-  auto response = NFD_OpenDialogN(&outPath, filters.ptr, filters.length.to!uint, defaultPath.ptr);
 
+  auto response = NFD_OpenDialogN(&outPath, filters.ptr, filters.length.to!uint, defaultPath.toStringz);
   if (response.asOriginalType == Result.okay) {
     const selectedPath = outPath[0 .. outPath.strlen].to!string.idup;
     NFD_FreePathN(outPath);
@@ -51,8 +50,12 @@ Result openDialog(out string path, FilterItem[] filters, string defaultPath = nu
 }
 
 ///
-Result openDialogMultiple() {
-  assert(0, "Unimplemented!");
+Result openDialogMultiple(out PathSet paths, FilterItem[] filters, string defaultPath = null) {
+  PathSet outPaths;
+
+  auto response = NFD_OpenDialogMultipleN(outPaths.ptr, filters.ptr, filters.length.to!uint, defaultPath.toStringz);
+  paths = outPaths;
+  return response.asOriginalType.to!Result;
 }
 
 ///
@@ -61,8 +64,16 @@ Result saveDialog() {
 }
 
 ///
-Result pickFolder() {
-  assert(0, "Unimplemented!");
+Result pickFolder(out string path, string defaultPath = null) {
+  nfdchar_t* outPath;
+
+  auto response = NFD_PickFolderN(&outPath, defaultPath.toStringz);
+  if (response.asOriginalType == Result.okay) {
+    const selectedPath = outPath[0 .. outPath.strlen].to!string.idup;
+    NFD_FreePathN(outPath);
+    path = selectedPath;
+  }
+  return response.asOriginalType.to!Result;
 }
 
 ///
@@ -74,6 +85,11 @@ struct PathSet {
 
   ~this() {
     NFD_PathSet_Free(set);
+  }
+
+  const(void)** ptr() const @property {
+    import std.conv : castFrom;
+    return castFrom!(const void*).to!(const(void)**)(set);
   }
 
   ///
