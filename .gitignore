@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/nfde
+nfde.so
+nfde.dylib
+nfde.dll
+nfde.a
+nfde.lib
+nfde-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst

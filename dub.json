@@ -1,0 +1,23 @@
+{
+	"name": "nfde",
+	"description": "D bindings to Native File Dialog Extended",
+	"copyright": "Copyright © 2024, Chance Snow",
+	"license": "Zlib",
+	"authors": [
+		"Chance Snow <git@chancesnow.me>"
+	],
+	"targetType": "staticLibrary",
+	"preBuildCommands-posix": [
+		"mkdir -p $NFDE_PACKAGE_DIR/nativefiledialog-extended/build",
+		"cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/build -DNFD_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release $NFDE_PACKAGE_DIR/nativefiledialog-extended",
+		"cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/build"
+	],
+	"preBuildCommands-windows": [
+		"IF NOT EXIST $NFDE_PACKAGE_DIR/nativefiledialog-extended/build mkdir $NFDE_PACKAGE_DIR/nativefiledialog-extended/build",
+		"cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/build -DNFD_BUILD_TESTS=OFF $NFDE_PACKAGE_DIR/nativefiledialog-extended",
+		"cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/build --config Release"
+	],
+	"lflags-posix": [
+		"$NFDE_PACKAGE_DIR/nativefiledialog-extended/build/src/libnfd.a"
+	]
+}
