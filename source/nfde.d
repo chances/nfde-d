@@ -1,7 +1,8 @@
 module nfde;
 
 import core.stdc.limits : PATH_MAX;
-import std.conv : to;
+import core.stdc.string : strlen;
+import std.conv : asOriginalType, to;
 
 import nfde_bindings;
 
@@ -38,14 +39,15 @@ alias FilterItem = nfdnfilteritem_t;
 Result openDialog(out string path, FilterItem[] filters, string defaultPath = null) {
   import std.conv : castFrom;
 
-  string selectedPath = new char[PATH_MAX];
-  auto response = NFD_OpenDialogN(
-    castFrom!(string*).to!(nfdnchar_t**)(&selectedPath),
-    filters.ptr, filters.length.to!uint,
-    defaultPath.ptr
-  );
-  path = selectedPath;
-  return response.to!uint.to!Result;
+  nfdchar_t* outPath;
+  auto response = NFD_OpenDialogN(&outPath, filters.ptr, filters.length.to!uint, defaultPath.ptr);
+
+  if (response.asOriginalType == Result.okay) {
+    const selectedPath = outPath[0 .. outPath.strlen].to!string.idup;
+    NFD_FreePathN(outPath);
+    path = selectedPath;
+  }
+  return response.asOriginalType.to!Result;
 }
 
 ///
@@ -68,8 +70,6 @@ alias PathSetSize = nfdpathsetsize_t;
 
 ///
 struct PathSet {
-  import std.conv : asOriginalType;
-
   package nfdpathset_t* set;
 
   ~this() {
