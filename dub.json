@@ -6,6 +6,7 @@
   "authors": [
     "Chance Snow <git@chancesnow.me>"
   ],
+  "systemDependencies": "CMake, Ninja",
   "subPackages": [
     "./examples/dialogs"
   ],
@@ -30,19 +31,23 @@
     }
   ],
   "preBuildCommands-posix": [
-    "mkdir -p $NFDE_PACKAGE_DIR/nativefiledialog-extended/build",
-    "cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/build -DNFD_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release $NFDE_PACKAGE_DIR/nativefiledialog-extended",
-    "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/build"
+    "mkdir -p $NFDE_PACKAGE_DIR/nativefiledialog-extended/out",
+    "cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/out -DCMAKE_GENERATOR=Ninja -DNFD_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release $NFDE_PACKAGE_DIR/nativefiledialog-extended",
+    "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/out"
   ],
   "preBuildCommands-windows": [
-    "IF NOT EXIST $NFDE_PACKAGE_DIR/nativefiledialog-extended/build mkdir $NFDE_PACKAGE_DIR/nativefiledialog-extended/build",
-    "cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/build -DNFD_BUILD_TESTS=OFF $NFDE_PACKAGE_DIR/nativefiledialog-extended",
-    "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/build --config Release"
+    "IF EXIST $NFDE_PACKAGE_DIR/.git git submodule update --recursive",
+    "IF NOT EXIST $NFDE_PACKAGE_DIR/nativefiledialog-extended git clone https://github.com/btzy/nativefiledialog-extended.git $NFDE_PACKAGE_DIR/nativefiledialog-extended",
+    "cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/out -DCMAKE_GENERATOR=Ninja -DNFD_BUILD_TESTS=OFF $NFDE_PACKAGE_DIR/nativefiledialog-extended",
+    "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/out --config Release"
   ],
   "libs-windows": ["ole32", "uuid", "shell32"],
   "lflags-osx": ["-weak_framework", "AppKit", "-weak_framework", "UniformTypeIdentifiers"],
   "libs-linux": ["gtk-3"],
   "lflags-posix": [
-    "$NFDE_PACKAGE_DIR/nativefiledialog-extended/build/src/libnfd.a"
+    "$NFDE_PACKAGE_DIR/nativefiledialog-extended/out/src/libnfd.a"
+  ],
+  "lflags-windows": [
+    "$NFDE_PACKAGE_DIR\\nativefiledialog-extended\\out\\src\\nfd.lib"
   ]
 }

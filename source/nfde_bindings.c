@@ -1,1 +1,1 @@
-#import "../nativefiledialog-extended/src/include/nfd.h"
+#include "../nativefiledialog-extended/src/include/nfd.h"

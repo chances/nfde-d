@@ -1,12 +1,20 @@
 module nfde;
 
 import core.stdc.limits : PATH_MAX;
+version (Windows) import core.stdc.wchar_ : wcslen;
 import core.stdc.string : strlen;
-import std.conv : asOriginalType, to;
+import std.conv : asOriginalType, castFrom, to;
 import std.string : toStringz;
+import std.traits : isPointer;
+import std.utf : toUTF8, toUTF16z, toUTFz;
 
 import nfde_bindings;
 
+package alias toUTF8z = toUTFz!(char*);
+version (Windows) package alias Char = wchar;
+else package alias Char = char;
+version (Windows) package alias String = wstring;
+else package alias String = string;
 package auto isInitialized = false;
 
 static this() {
@@ -35,15 +43,26 @@ string getError() {
 }
 
 ///
+nfdnchar_t* toNfdChar(T)(T value) if (isPointer!T) {
+  return castFrom!(T).to!(nfdnchar_t*)(value);
+}
+
+///
 alias FilterItem = nfdnfilteritem_t;
 
 ///
 Result openDialog(out string path, FilterItem[] filters, string defaultPath = null) {
-  nfdchar_t* outPath;
+  nfdnchar_t* outPath;
 
-  auto response = NFD_OpenDialogN(&outPath, filters.ptr, filters.length.to!uint, defaultPath.toStringz);
+  version (Windows) auto response = NFD_OpenDialogN(
+    &outPath, filters.ptr, filters.length.to!uint, defaultPath.toUTF16z.toNfdChar
+  );
+  else auto response = NFD_OpenDialogN(&outPath, filters.ptr, filters.length.to!uint, defaultPath.toStringz);
   if (response.asOriginalType == Result.okay) {
-    const selectedPath = outPath[0 .. outPath.strlen].to!string.idup;
+    version (Windows) const selectedPath = (
+      cast(wchar[]) outPath[0 .. (cast(wchar*) outPath).wcslen]
+    ).toUTF8.to!string;
+    else const selectedPath = outPath[0 .. outPath.strlen].to!string.idup;
     NFD_FreePathN(outPath);
     path = selectedPath;
   }
@@ -56,7 +75,10 @@ Result openDialog(out string path, FilterItem[] filters, string defaultPath = nu
 Result openDialogMultiple(out PathSet paths, FilterItem[] filters, string defaultPath = null) {
   PathSet outPaths;
 
-  auto response = NFD_OpenDialogMultipleN(outPaths.ptr, filters.ptr, filters.length.to!uint, defaultPath.toStringz);
+  version (Windows) auto response = NFD_OpenDialogMultipleN(
+    outPaths.ptr, filters.ptr, filters.length.to!uint, defaultPath.toUTF16z.toNfdChar
+  );
+  else auto response = NFD_OpenDialogMultipleN(outPaths.ptr, filters.ptr, filters.length.to!uint, defaultPath.toUTF8z);
   paths = outPaths;
   return response.asOriginalType.to!Result;
 }
@@ -65,14 +87,20 @@ Result openDialogMultiple(out PathSet paths, FilterItem[] filters, string defaul
 
 ///
 Result saveDialog(out string path, FilterItem[] filters, string defaultName = null, string defaultPath = null) {
-  nfdchar_t* savePath;
+  nfdnchar_t* savePath;
 
-  auto response = NFD_SaveDialogN(
-    &savePath, filters.ptr, filters.length.to!uint, defaultPath.toStringz, defaultName.toStringz
+  version (Windows) auto response = NFD_SaveDialogN(
+    &savePath, filters.ptr, filters.length.to!uint, defaultPath.toUTF16z.toNfdChar, defaultName.toUTF16z.toNfdChar
+  );
+  else auto response = NFD_SaveDialogN(
+    &savePath, filters.ptr, filters.length.to!uint, defaultPath.toUTF8z, defaultName.toUTF8z
   );
   if (response.asOriginalType == Result.okay) {
-    const selectedPath = savePath[0 .. savePath.strlen].to!string.idup;
-    NFD_FreePathN(savePath);
+    version (Windows) const selectedPath = (
+      cast(wchar[]) savePath[0 .. (cast(wchar*) savePath).wcslen]
+    ).toUTF8.to!string;
+    else const selectedPath = savePath[0 .. savePath.strlen].to!string.idup;
+    NFD_FreePathN(savePath.toNfdChar);
     path = selectedPath;
   }
   return response.asOriginalType.to!Result;
@@ -82,12 +110,16 @@ Result saveDialog(out string path, FilterItem[] filters, string defaultName = nu
 
 ///
 Result pickFolder(out string path, string defaultPath = null) {
-  nfdchar_t* outPath;
+  nfdnchar_t* outPath;
 
-  auto response = NFD_PickFolderN(&outPath, defaultPath.toStringz);
+  version (Windows) auto response = NFD_PickFolderN(&outPath, defaultPath.toUTF16z.toNfdChar);
+  else auto response = NFD_PickFolderN(&outPath, defaultPath.toUTF8z);
   if (response.asOriginalType == Result.okay) {
-    const selectedPath = outPath[0 .. outPath.strlen].to!string.idup;
-    NFD_FreePathN(outPath);
+    version (Windows) const selectedPath = (
+      cast(wchar[]) outPath[0 .. (cast(wchar*) outPath).wcslen]
+    ).toUTF8.to!string;
+    else const selectedPath = outPath[0 .. outPath.strlen].to!string.idup;
+    NFD_FreePathN(outPath.toNfdChar);
     path = selectedPath;
   }
   return response.asOriginalType.to!Result;
@@ -113,9 +145,9 @@ struct PathSet {
 
   ///
   ulong length() const @property {
-    ulong count;
+    nfdpathsetsize_t count;
     assert(NFD_PathSet_GetCount(set, &count).asOriginalType == Result.okay);
-    return count;
+    return count.to!ulong;
   }
 
   // TODO: Implement an enumerator interface with std.slice: NFD_PathSet_GetEnum, NFD_PathSet_EnumNextN, NFD_PathSet_FreeEnum
@@ -125,7 +157,7 @@ struct PathSet {
     assert(i >= 0 && i < this.length);
     auto path = new nfdnchar_t[PATH_MAX];
     auto pathPtr = path.ptr;
-    assert(NFD_PathSet_GetPathN(set, i, &pathPtr).asOriginalType == Result.okay);
+    assert(NFD_PathSet_GetPathN(set, i.to!nfdpathsetsize_t, &pathPtr).asOriginalType == Result.okay);
     // TODO: NFD_PathSet_FreePathN
     return path.to!string;
   }
@@ -135,7 +167,7 @@ struct PathSet {
     assert(index >= 0 && index < this.length);
     auto path = new nfdu8char_t[PATH_MAX];
     auto pathPtr = path.ptr;
-    assert(NFD_PathSet_GetPathU8(set, index, &pathPtr).asOriginalType == Result.okay);
+    assert(NFD_PathSet_GetPathU8(set, index.to!nfdpathsetsize_t, &pathPtr).asOriginalType == Result.okay);
     // TODO: NFD_PathSet_FreePathU8
     return path.to!string;
   }
