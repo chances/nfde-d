@@ -6,7 +6,7 @@
   "authors": [
     "Chance Snow <git@chancesnow.me>"
   ],
-  "systemDependencies": "CMake, Ninja",
+  "systemDependencies": "CMake, Ninja, See `libs` and `lflags` for OS-specific dependencies.",
   "subPackages": [
     "./examples/dialogs"
   ],
