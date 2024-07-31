@@ -2,6 +2,9 @@
 bin/libnfde.a
 bin/nfde_dialogs
 
+# Dependencies
+nativefiledialog-extended/
+
 # Dub
 .dub
 docs.json

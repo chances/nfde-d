@@ -31,13 +31,13 @@
     }
   ],
   "preBuildCommands-posix": [
+    "[ -d \"$NFDE_PACKAGE_DIR/nativefiledialog-extended/.git\" ] || git clone --depth 1 https://github.com/btzy/nativefiledialog-extended.git $NFDE_PACKAGE_DIR/nativefiledialog-extended",
     "mkdir -p $NFDE_PACKAGE_DIR/nativefiledialog-extended/out",
     "cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/out -DCMAKE_GENERATOR=Ninja -DNFD_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release $NFDE_PACKAGE_DIR/nativefiledialog-extended",
     "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/out"
   ],
   "preBuildCommands-windows": [
-    "IF EXIST $NFDE_PACKAGE_DIR/.git git submodule update --recursive",
-    "IF NOT EXIST $NFDE_PACKAGE_DIR/nativefiledialog-extended git clone https://github.com/btzy/nativefiledialog-extended.git $NFDE_PACKAGE_DIR/nativefiledialog-extended",
+    "IF NOT EXIST $NFDE_PACKAGE_DIR/nativefiledialog-extended/.git git clone --depth 1 https://github.com/btzy/nativefiledialog-extended.git $NFDE_PACKAGE_DIR/nativefiledialog-extended",
     "cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/out -DCMAKE_GENERATOR=Ninja -DNFD_BUILD_TESTS=OFF $NFDE_PACKAGE_DIR/nativefiledialog-extended",
     "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/out --config Release"
   ],
