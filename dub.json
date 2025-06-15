@@ -34,7 +34,7 @@
     "[ -d \"$NFDE_PACKAGE_DIR/nativefiledialog-extended/.git\" ] || git clone --depth 1 https://github.com/btzy/nativefiledialog-extended.git $NFDE_PACKAGE_DIR/nativefiledialog-extended",
     "mkdir -p $NFDE_PACKAGE_DIR/nativefiledialog-extended/out",
     "cmake -B $NFDE_PACKAGE_DIR/nativefiledialog-extended/out -DCMAKE_GENERATOR=Ninja -DNFD_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release $NFDE_PACKAGE_DIR/nativefiledialog-extended",
-    "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/out"
+    "cmake --build $NFDE_PACKAGE_DIR/nativefiledialog-extended/out --config Release"
   ],
   "preBuildCommands-windows": [
     "IF NOT EXIST $NFDE_PACKAGE_DIR/nativefiledialog-extended/.git git clone --depth 1 https://github.com/btzy/nativefiledialog-extended.git $NFDE_PACKAGE_DIR/nativefiledialog-extended",
